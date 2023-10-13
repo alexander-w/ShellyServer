@@ -14,6 +14,7 @@ eg http://192.168.0.20:8081/wcf/trv/186
 Valve closed: http://[serverip]:8081/wcf/trvoff/[last segment of trv ip address]
 eg http://192.168.0.20:8081/wcf/trvoff/186
 NB: Assuming you have set up your TRVs according to the Shelly guide, your Valve closed URL will already be set to turn the boiler switch off and you should leave this as a secondary URL for added redundancy (but there should only be one URL for valve on)
+• Run ShellyServer.exe as administrator
 
 
 

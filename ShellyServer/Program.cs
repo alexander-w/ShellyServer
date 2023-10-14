@@ -18,8 +18,9 @@ namespace ShellyServer
     class Program
     {
         static Stopwatch boilerUsage = new Stopwatch();
-        static System.Timers.Timer switchTimer;
-        static int aggregateValvePos = 0;
+        //static System.Timers.Timer switchTimer;
+        static Dictionary<string, int> TRVPositions = new Dictionary<string, int>();
+
 
         static string myIP;
         static string switchIP;
@@ -35,7 +36,6 @@ namespace ShellyServer
             log("turning off boiler");
             new WebClient().DownloadString("http://"+ switchIP +"/relay/0?turn=off");
             boilerUsage.Stop();
-            aggregateValvePos = 0;
         }
 
         static void turnon()
@@ -75,11 +75,11 @@ namespace ShellyServer
             host.Open();
             Console.WriteLine("wcf Service Started!!!");
 
-            switchTimer = new System.Timers.Timer();
-            switchTimer.Interval = 5 * 60 * 1000;
-            switchTimer.Elapsed += Messagepump_Elapsed;
-            switchTimer.AutoReset = true;
-            switchTimer.Enabled = true;
+            //switchTimer = new System.Timers.Timer();
+            //switchTimer.Interval = 5 * 60 * 1000;
+            //switchTimer.Elapsed += Messagepump_Elapsed;
+            //switchTimer.AutoReset = true;
+            //switchTimer.Enabled = true;
 
             while (true) {
                 Thread.Sleep(200);
@@ -89,14 +89,14 @@ namespace ShellyServer
 
         private static void Messagepump_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (aggregateValvePos >= 100)
+
+            if(TRVPositions.Sum(x=> x.Value) >= 100)
             {
                 turnon();
             }
             else
                 turnOff();
 
-            aggregateValvePos = 0;
             showheatingtime();
         }
 
@@ -115,8 +115,16 @@ namespace ShellyServer
                     var valvepos = (int)jsobj["thermostats"][0]["pos"];
 
                     log("Valve pos: " + valvepos);
-                    aggregateValvePos += valvepos;
 
+                    if (!TRVPositions.ContainsKey(iplast))
+                    {
+                        TRVPositions.Add(iplast, valvepos);
+                    }
+                    else {
+                        TRVPositions[iplast] = valvepos;
+                    }
+
+                    Messagepump_Elapsed(null, null);
                 }
                 catch (Exception e){
                     log(e.ToString());
@@ -129,7 +137,11 @@ namespace ShellyServer
             {
                 var ip = getIPBase() + "." + iplast;
                 log("boiler request turn OFF from " + ip);
-                turnOff();
+                if (TRVPositions.ContainsKey(iplast))
+                {
+                    TRVPositions[iplast] = 0;
+                }
+                Messagepump_Elapsed(null, null);
             }
 
         }

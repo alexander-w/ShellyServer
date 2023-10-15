@@ -1,7 +1,7 @@
 # ShellyServer
 Obligatory disclaimer: Use at your own risk, no warranty is implied or provided and no responsibility taken for any damage caused by using this application.
 
-This small program aims to prevent the boiler struggling to circulate or wasting energy when the valve positions of the TRVs are too low. The logic is simply that it runs a timer with a 5 minute interval, and if the sum total valve positions requested in that time add up to >= 100 it turns on the switch, otherwise it turns it off i.e this can be one radiator fully on, or 2 radiators 50% on etc (This timer relies on the fact the TRVs are designed to access the Valve On URL every 5 minutes when the valve pos is > 0)
+This small program aims to prevent the boiler struggling to circulate or wasting energy when the valve positions of the TRVs are too low. The logic is simply that it builds a dictionary of TRVs and their valve positions, and if the sum total valve positions add up to >= 100 it turns on the switch, otherwise it turns it off i.e this can be one radiator fully on, or 2 radiators 50% on etc (Note that the TRVs are designed to access the Valve On URL every 5 minutes when the valve pos is > 0 so the dictionary can take up to 5 minutes to fully populate)
 
 To use it you need to:
 

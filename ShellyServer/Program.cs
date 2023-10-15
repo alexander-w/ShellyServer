@@ -90,13 +90,16 @@ namespace ShellyServer
         private static void Messagepump_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
 
-            if(TRVPositions.Sum(x=> x.Value) >= 100)
+            if (TRVPositions.Sum(x => x.Value) >= 100)
             {
+                log("Sum of TRV positions is >= 100");
                 turnon();
             }
             else
+            {
+                log("Sum of TRV positions is < 100");
                 turnOff();
-
+            }
             showheatingtime();
         }
 

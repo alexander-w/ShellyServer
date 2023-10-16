@@ -76,7 +76,7 @@ namespace ShellyServer
             Console.WriteLine("wcf Service Started!!!");
 
             switchTimer = new System.Timers.Timer();
-            switchTimer.Interval = 5 * 60 * 1000;
+            switchTimer.Interval = 6 * 60 * 1000;
             switchTimer.Elapsed += SwitchTimer_Elapsed;
             switchTimer.AutoReset = true;
             switchTimer.Enabled = true;
@@ -89,7 +89,7 @@ namespace ShellyServer
 
         private static void SwitchTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            log("There were no successful requests in the last 5 minutes so ensure boiler is off");
+            log("There were no successful requests in the last 6 minutes so ensure boiler is off");
             turnOff();
         }
 

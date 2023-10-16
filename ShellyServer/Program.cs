@@ -18,7 +18,7 @@ namespace ShellyServer
     class Program
     {
         static Stopwatch boilerUsage = new Stopwatch();
-        //static System.Timers.Timer switchTimer;
+        static System.Timers.Timer switchTimer;
         static Dictionary<string, int> TRVPositions = new Dictionary<string, int>();
 
 
@@ -75,11 +75,11 @@ namespace ShellyServer
             host.Open();
             Console.WriteLine("wcf Service Started!!!");
 
-            //switchTimer = new System.Timers.Timer();
-            //switchTimer.Interval = 5 * 60 * 1000;
-            //switchTimer.Elapsed += Messagepump_Elapsed;
-            //switchTimer.AutoReset = true;
-            //switchTimer.Enabled = true;
+            switchTimer = new System.Timers.Timer();
+            switchTimer.Interval = 5 * 60 * 1000;
+            switchTimer.Elapsed += SwitchTimer_Elapsed;
+            switchTimer.AutoReset = true;
+            switchTimer.Enabled = true;
 
             while (true) {
                 Thread.Sleep(200);
@@ -87,7 +87,13 @@ namespace ShellyServer
 
         }
 
-        private static void Messagepump_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private static void SwitchTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            log("There were no successful requests in the last 5 minutes so ensure boiler is off");
+            turnOff();
+        }
+
+        private static void ProcessSwitchRequest()
         {
 
             if (TRVPositions.Sum(x => x.Value) >= 100)
@@ -101,6 +107,9 @@ namespace ShellyServer
                 turnOff();
             }
             showheatingtime();
+            //reset timer;
+            switchTimer.Stop();
+            switchTimer.Start();
         }
 
         [ServiceContract]
@@ -127,7 +136,7 @@ namespace ShellyServer
                         TRVPositions[iplast] = valvepos;
                     }
 
-                    Messagepump_Elapsed(null, null);
+                    ProcessSwitchRequest();
                 }
                 catch (Exception e){
                     log(e.ToString());
@@ -144,7 +153,10 @@ namespace ShellyServer
                 {
                     TRVPositions[iplast] = 0;
                 }
-                Messagepump_Elapsed(null, null);
+                ProcessSwitchRequest();
+                //reset timer
+                switchTimer.Stop();
+                switchTimer.Start();
             }
 
         }
